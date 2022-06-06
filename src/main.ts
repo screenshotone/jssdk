@@ -1,14 +1,14 @@
 import * as crypto from 'crypto';
 import Big from 'big.js';
-import fetch from 'node-fetch';
+import fetch from 'cross-fetch';
+
+const API_BASE_URL = "https://api.screenshotone.com";
+const API_TAKE_PATH = "/take";
 
 /**
  * Represents an API client for the screenshotone.com API.
  */
 export class Client {
-    private readonly API_BASE_URL = "https://api.screenshotone.com";
-    private readonly API_TAKE_PATH = "/take";
-
     private readonly accessKey: string;
     private readonly secretKey: string;
 
@@ -27,7 +27,7 @@ export class Client {
             .digest('hex');
         queryString += '&signature=' + signature;
 
-        return `${this.API_BASE_URL}${this.API_TAKE_PATH}?${queryString}`;
+        return `${API_BASE_URL}${API_TAKE_PATH}?${queryString}`;
     }
 
     async take(options: TakeOptions): Promise<Blob> {
@@ -37,7 +37,9 @@ export class Client {
             return await response.blob()
         }
 
-        throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}`);
+        const data = await response.json();
+
+        throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`);
     }
 }
 
