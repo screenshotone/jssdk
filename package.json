@@ -1,0 +1,38 @@
+{
+  "name": "screenshotone-api-sdk",
+  "version": "1.0.0",
+  "description": "Use ScreenshotOne.com API to generate screenshots of any website.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/screenshotone/tssdk.git"
+  },
+  "keywords": [
+    "screenshot",
+    "phantom",
+    "phantomjs",
+    "screenshots",
+    "webkit",
+    "webkit2png",
+    "url2png",
+    "headless",
+    "chrome",
+    "chromium",
+    "blink",
+    "render"
+  ],
+  "author": "Dmytro Krasun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/screenshotone/tssdk/issues"
+  },
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^4.7.3"
+  },
+  "dependencies": {
+    "@types/node": "^17.0.40",
+    "big.js": "^6.2.0",
+    "@types/big.js": "^6.1.3",
+    "node-fetch": "^3.2.5"
+  }
+}

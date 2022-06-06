@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "module": "es2022",
+      "target": "es2017",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "sourceMap": true,
+      "moduleResolution": "node",
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+  }
