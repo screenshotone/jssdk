@@ -7,6 +7,8 @@ An official [Screenshot API](https://screenshotone.com/) client for JavaScript a
 
 It takes minutes to start taking screenshots. Just [sign up](https://screenshotone.com/) to get access and secret keys, import the client, and you are ready to go. 
 
+The SDK client is synchronized with the latest [screenshot API options](https://screenshotone.com/docs/options/).
+
 ## Installation
 
 ```shell
