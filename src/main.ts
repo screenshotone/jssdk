@@ -63,11 +63,55 @@ export class TakeOptions {
         return new TakeOptions(url);
     }
 
+    /**
+     * Initializes take screenshot options with provided HTML.
+     */
+    static html(url: string): TakeOptions {
+        return new TakeOptions(url);
+    }
+
     private put(key: string, ...values: string[]) {
         for (const value of values) {
             this.query.append(key, value);
         }
     };
+
+    /**
+    * Selector is a CSS-like selector of the element to take a screenshot of.
+    */
+    selector(selector: string) {
+        this.put("selector", selector);
+
+        return this;
+    }
+
+    /**
+     * It determines the behavior of what to do when selector is not found.
+     */
+    errorOnSelectorNotFound(errorOn: boolean) {
+        this.put("error_on_selector_not_found", errorOn ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Styles specifies custom CSS styles for the page.
+     */
+    styles(styles: string) {
+        this.put("styles", styles);
+
+        return this;
+    }
+
+    /**
+     * Scripts specifies custom scripts for the page.
+     */
+    scripts(scripts: string) {
+        this.put("scripts", scripts);
+
+        return this;
+    }
+
 
     /**
      * Renders the full page.
