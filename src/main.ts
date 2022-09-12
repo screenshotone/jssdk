@@ -6,7 +6,7 @@ const API_BASE_URL = "https://api.screenshotone.com";
 const API_TAKE_PATH = "/take";
 
 /**
- * Represents an API client for the screenshotone.com API.
+ * Represents an API client for the ScreenshotOne.com API.
  */
 export class Client {
     private readonly accessKey: string;
@@ -21,6 +21,8 @@ export class Client {
         const query = options.toQuery();
         query.append("access_key", this.accessKey);
         let queryString = query.toString();
+
+        console.log(queryString);
 
         const signature = crypto.createHmac("sha256", this.secretKey)
             .update(queryString, 'utf-8')
@@ -49,9 +51,8 @@ export class Client {
 export class TakeOptions {
     private readonly query: URLSearchParams;
 
-    private constructor(url: string) {
+    private constructor() {
         const query = new URLSearchParams();
-        query.append("url", url);
 
         this.query = query;
     }
@@ -60,14 +61,30 @@ export class TakeOptions {
      * Initializes take screenshot options with provided website URL.
      */
     static url(url: string): TakeOptions {
-        return new TakeOptions(url);
+        const options = new TakeOptions();
+        options.put("url", url);
+
+        return options;
     }
 
     /**
      * Initializes take screenshot options with provided HTML.
      */
-    static html(url: string): TakeOptions {
-        return new TakeOptions(url);
+    static html(html: string): TakeOptions {
+        const options = new TakeOptions();
+        options.put("html", html);
+
+        return options;
+    }
+
+    /**
+     * Initializes take screenshot options with provided Markdown.
+     */
+    static markdown(markdown: string): TakeOptions {
+        const options = new TakeOptions();
+        options.put("markdown", markdown);
+
+        return options;
     }
 
     private put(key: string, ...values: string[]) {
@@ -90,6 +107,66 @@ export class TakeOptions {
      */
     errorOnSelectorNotFound(errorOn: boolean) {
         this.put("error_on_selector_not_found", errorOn ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * When reduced_motion set to `true`, 
+     * the API will request the site to minimize the amount of non-essential motion it uses. 
+     * When the site supports it, it should use animations as least as possible.
+     */
+    reducedMotion(darkMode: boolean): TakeOptions {
+        this.put("reduced_motion", darkMode ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * If you want to request the page and it is supported to be rendered for printers, specify `print`. 
+     * If the page is by default rendered for printers and you want it to be rendered for screens, 
+     * use `screen`.
+     */
+    mediaType(mediaType: string): TakeOptions {
+        this.put("media_type", mediaType);
+
+        return this;
+    }
+
+    /**
+     * Set `true` to request site rendering, if supported, in the dark mode. 
+     * Set `false` to request site rendering in the light mode if supported. 
+     * If you don’t set the parameter. The site is rendered in the default mode.
+     */
+    darkMode(darkMode: boolean): TakeOptions {
+        this.put("dark_mode", darkMode ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * The `hide_selectors` option allows hiding elements before taking a screenshot. 
+     * You can specify as many selectors as you wish. 
+     * All elements that match each selector will be hidden by 
+     * setting the `display` style property to none `!important`.
+     */
+    hideSelectors(...selectors: string[]): TakeOptions {
+        this.put("hide_selectors", ...selectors);
+
+        return this;
+    }
+
+    /**
+     * The scripts_wain_until option allows you to wait until a given 
+     * set of events after the scripts were executed.     
+     * It accepts the same values as wait_until and can have multiple values:
+     *  - `load`: the navigation is successful when the load even is fired;
+     *  - `domcontentloaded`: the navigation is finished when the DOMContentLoaded even is fired;
+     *  - `networkidle0`: the navigation is finished when there are no more than 0 network connections for at least 500 ms;
+     *  _ `networkidle2`: consider navigation to be finished when there are no more than 2 network connections for at least 500 ms.
+     */
+    scriptsWaitUntil(...until: string[]): TakeOptions {
+        this.put("scripts_wait_until", ...until);
 
         return this;
     }
@@ -151,6 +228,18 @@ export class TakeOptions {
     }
 
     /**
+     * Instead of manually specifying viewport parameters like width and height, 
+     * you can specify a device to use for emulation. 
+     * In addition, other parameters of the viewport, including the user agent, 
+     * will be set automatically.
+     */
+    viewportDevice(viewportDevice: string): TakeOptions {
+        this.put("viewport_device", viewportDevice);
+
+        return this;
+    }
+
+    /**
      * Sets the width of the browser viewport (pixels).
      */
     viewportWidth(viewportWidth: number): TakeOptions {
@@ -173,6 +262,33 @@ export class TakeOptions {
      */
     deviceScaleFactor(deviceScaleFactor: number): TakeOptions {
         this.put("device_scale_factor", deviceScaleFactor.toString());
+
+        return this;
+    }
+
+    /**
+     * Whether the meta viewport tag is taken into account. Defaults to `false`.
+     */
+    viewportMobile(isMobile: boolean): TakeOptions {
+        this.put("viewport_mobile", isMobile ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * The default value is `false`. Set to `true` if the viewport supports touch events.
+     */
+    viewportHasTouch(hasTouch: boolean): TakeOptions {
+        this.put("viewport_has_touch", hasTouch ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * The default value is `false`. Set to `true` if the viewport is in landscape mode.
+     */
+    viewportLandscape(landscape: boolean): TakeOptions {
+        this.put("viewport_landscape", landscape ? "true" : "false");
 
         return this;
     }
@@ -210,6 +326,24 @@ export class TakeOptions {
      */
     blockAds(blockAds: boolean): TakeOptions {
         this.put("block_ads", blockAds ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Blocks cookie banners.
+     */
+    blockCookieBanners(block: boolean): TakeOptions {
+        this.put("block_cookie_banners", block ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Blocks chats.
+     */
+    blockChats(block: boolean): TakeOptions {
+        this.put("block_chats", block ? "true" : "false");
 
         return this;
     }
