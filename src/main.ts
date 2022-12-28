@@ -22,8 +22,6 @@ export class Client {
         query.append("access_key", this.accessKey);
         let queryString = query.toString();
 
-        console.log(queryString);
-
         const signature = crypto.createHmac("sha256", this.secretKey)
             .update(queryString, 'utf-8')
             .digest('hex');

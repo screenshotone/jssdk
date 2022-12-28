@@ -43,6 +43,14 @@ fs.writeFileSync("example.png", buffer)
 // the screenshot is store in the example.png file
 ```
 
+## Build and publish (a manual for SDK developers)
+
+To build and publish the SDK: 
+
+1. Bump the version property in the `package.json` file. 
+2. Run `npm run prepare`. 
+3. Run `npm publish`.
+
 ## License 
 
 `screenshotone/jssdk` is released under [the MIT license](LICENSE).
