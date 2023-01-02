@@ -467,6 +467,47 @@ export class TakeOptions {
         return this;
     }
 
+    /**
+     * Default value is false. Use store=true to trigger upload of the taken screenshot, 
+     * rendered HTML or PDF to the configured S3 bucket. 
+     * Make sure you configured access to S3.
+     */
+    store(store: boolean): TakeOptions {
+        this.put("store", store ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * The parameter is required if you set store=true. 
+     * You must specify the key for the file, but don’t specify an extension, 
+     * it will be added automatically based on the format you specified. 
+     * You can also specify “subdirectories” in the path part.
+     */
+    storagePath(path: string): TakeOptions {
+        this.put("storage_path", path);
+
+        return this;
+    }
+
+    /**
+     * You can override the default bucket you configured with storage_bucket=<bucket name>.
+     */
+    storageBucket(bucket: string): TakeOptions {
+        this.put("storage_bucket", bucket);
+
+        return this;
+    }
+
+    /**
+     * Storage class allows you to specify the object storage class.
+     */
+    storageClass(storageClass: string): TakeOptions {
+        this.put("storage_class", storageClass);
+
+        return this;
+    }
+
     toQuery(): URLSearchParams {
         return new URLSearchParams(this.query.toString());
     }
