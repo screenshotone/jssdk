@@ -92,10 +92,22 @@ export class TakeOptions {
     };
 
     /**
-    * Selector is a CSS-like selector of the element to take a screenshot of.
-    */
+     * Selector is a CSS-like selector of the element to take a screenshot of.
+     */
     selector(selector: string) {
         this.put("selector", selector);
+
+        return this;
+    }
+
+    /**
+     * Available response types:
+     * by_format — return exactly the response defined in the format option. If format=png, the response will be the binary representation of the png with the content type header image/png;
+     * empty — return only status or error. It is suitable when you want to upload the screenshot to storage and don’t care about the results. It also speeds up the response since there are no networking costs involved.
+     * The default value is by_format.     
+     */
+    responseType(responseType: string) {
+        this.put("response_type", responseType);
 
         return this;
     }
