@@ -122,6 +122,15 @@ export class TakeOptions {
     }
 
     /**
+     * Capture beyond the viewport.
+     */
+    captureBeyondViewport(beyond: boolean) {
+        this.put("capture_beyond_viewport", beyond ? "true" : "false");
+
+        return this;
+    }
+
+    /**
      * When reduced_motion set to `true`, 
      * the API will request the site to minimize the amount of non-essential motion it uses. 
      * When the site supports it, it should use animations as least as possible.
