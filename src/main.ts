@@ -514,6 +514,28 @@ export class TakeOptions {
     }
 
     /**
+     * It scrolls the page if needed and ensures that the given 
+     * selector is present in the view when taking a screenshot.
+     */
+    scrollIntoView(selector: string): TakeOptions {
+        this.put("scroll_into_view", selector);
+
+        return this;
+    }
+
+    /**
+     * You can use your custom proxy to take screenshots 
+     * or render HTML with the proxy option.
+     * 
+     * The https, http, socks4 and socks5 proxies are supported.
+     */
+    proxy(proxy: string): TakeOptions {
+        this.put("proxy", proxy);
+
+        return this;
+    }
+
+    /**
      * Set cookies for the request.
      */
     cookies(...cookies: string[]): TakeOptions {
@@ -530,6 +552,7 @@ export class TakeOptions {
 
         return this;
     }
+
 
     /**
      * TimeZone sets time zone for the request.
@@ -732,6 +755,18 @@ export class AnimateOptions {
      */
     styles(styles: string) {
         this.put("styles", styles);
+
+        return this;
+    }
+
+    /**
+     * You can use your custom proxy to take screenshots 
+     * or render HTML with the proxy option.
+     * 
+     * The https, http, socks4 and socks5 proxies are supported.
+     */
+    proxy(proxy: string): AnimateOptions {
+        this.put("proxy", proxy);
 
         return this;
     }
