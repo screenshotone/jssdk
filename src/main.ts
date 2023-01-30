@@ -423,6 +423,15 @@ export class TakeOptions {
     }
 
     /**
+     * Blocks banners by heuristics.
+     */
+    blockBannersByHeuristics(block: boolean): TakeOptions {
+        this.put("block_banners_by_heuristics", block ? "true" : "false");
+
+        return this;
+    }
+
+    /**
      * Blocks cookie banners.
      */
     blockCookieBanners(block: boolean): TakeOptions {
