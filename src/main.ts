@@ -121,10 +121,17 @@ export class Client {
      * @param options 
      * @returns 
      */
-    async store(options: AnimateOptions | TakeOptions, path: string, bucket?: string, acl?: "public-read" | "", storageClass?: string) {
+    async store(
+        options: AnimateOptions | TakeOptions,
+        path: string,
+        bucket?: string,
+        acl?: "public-read" | "",
+        storageClass?: string
+    ): Promise<{ bucket: string | null, key: string | null }> {
         options
             .store(true)
-            .storagePath(path);
+            .storagePath(path)
+            .responseType('empty');
 
         if (bucket) {
             options.storageBucket(bucket);
@@ -139,6 +146,18 @@ export class Client {
         const url = (options instanceof TakeOptions)
             ? this.generateSignedTakeURL(options)
             : this.generateSignedAnimateURL(options);
+
+        const response = await fetch(url);
+        if (response.ok) {
+            return {
+                key: response.headers.get('X-ScreenshotOne-Store-Key'),
+                bucket: response.headers.get('X-ScreenshotOne-Store-Bucket'),
+            };
+        }
+
+        const data = await response.json();
+
+        throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`);
     }
 }
 
