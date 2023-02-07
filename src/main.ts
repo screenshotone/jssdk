@@ -114,6 +114,32 @@ export class Client {
 
         throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`);
     }
+
+    /**
+     * Generates an animated screenshot and return the image blob.
+     * 
+     * @param options 
+     * @returns 
+     */
+    async store(options: AnimateOptions | TakeOptions, path: string, bucket?: string, acl?: "public-read" | "", storageClass?: string) {
+        options
+            .store(true)
+            .storagePath(path);
+
+        if (bucket) {
+            options.storageBucket(bucket);
+        }
+        if (acl) {
+            options.storageACL(acl);
+        }
+        if (storageClass) {
+            options.storageClass(storageClass)
+        }
+
+        const url = (options instanceof TakeOptions)
+            ? this.generateSignedTakeURL(options)
+            : this.generateSignedAnimateURL(options);
+    }
 }
 
 /**
@@ -616,6 +642,12 @@ export class TakeOptions {
         return this;
     }
 
+    storageACL(acl: string): TakeOptions {
+        this.put("storage_acl", acl);
+
+        return this;
+    }
+
     /**
      * You can override the default bucket you configured with storage_bucket=<bucket name>.
      */
@@ -1087,6 +1119,12 @@ export class AnimateOptions {
      */
     storageClass(storageClass: string): AnimateOptions {
         this.put("storage_class", storageClass);
+
+        return this;
+    }
+
+    storageACL(acl: string): AnimateOptions {
+        this.put("storage_acl", acl);
 
         return this;
     }
