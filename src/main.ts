@@ -734,7 +734,11 @@ export class AnimateOptions {
 
     private put(key: string, ...values: string[]) {
         for (const value of values) {
-            this.query.append(key, value);
+            if (values.length == 1) {
+                this.query.set(key, value);
+            } else {
+                this.query.append(key, value);
+            }
         }
     };
 
