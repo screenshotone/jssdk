@@ -1018,6 +1018,15 @@ export class AnimateOptions {
     }
 
     /**
+     * Blocks banners by heuristics.
+     */
+    blockBannersByHeuristics(block: boolean): AnimateOptions {
+        this.put("block_banners_by_heuristics", block ? "true" : "false");
+
+        return this;
+    }
+
+    /**
      * Enables caching.
      */
     cache(cache: boolean): AnimateOptions {
