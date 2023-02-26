@@ -92,9 +92,13 @@ export class Client {
             return await response.blob()
         }
 
-        const data = await response.json();
+        try {
+            const data = await response.json();
 
-        throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`);
+            throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`);
+        } catch (e) {
+            throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}`);
+        }        
     }
 
     /**
@@ -110,9 +114,13 @@ export class Client {
             return await response.blob()
         }
 
-        const data = await response.json();
+        try {
+            const data = await response.json();
 
-        throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`);
+            throw new Error(`failed to generate animation, response returned ${response.status} ${response.statusText}: ${data?.message}`);
+        } catch (e) {
+            throw new Error(`failed to generate animation, response returned ${response.status} ${response.statusText}`);
+        }        
     }
 
     /**
