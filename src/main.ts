@@ -98,7 +98,7 @@ export class Client {
             throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`);
         } catch (e) {
             throw new Error(`failed to take screenshot, response returned ${response.status} ${response.statusText}`);
-        }        
+        }
     }
 
     /**
@@ -120,7 +120,7 @@ export class Client {
             throw new Error(`failed to generate animation, response returned ${response.status} ${response.statusText}: ${data?.message}`);
         } catch (e) {
             throw new Error(`failed to generate animation, response returned ${response.status} ${response.statusText}`);
-        }        
+        }
     }
 
     /**
@@ -652,6 +652,15 @@ export class TakeOptions {
     }
 
     /**
+     * Sets navigation timeout.
+     */
+    navigationTimeout(timeout: number): TakeOptions {
+        this.put("navigation_timeout", timeout.toString());
+
+        return this;
+    }
+
+    /**
      * Default value is false. Use store=true to trigger upload of the taken screenshot, 
      * rendered HTML or PDF to the configured S3 bucket. 
      * Make sure you configured access to S3.
@@ -1123,6 +1132,15 @@ export class AnimateOptions {
      */
     timeout(timeout: number): AnimateOptions {
         this.put("timeout", timeout.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets navigation timeout.
+     */
+    navigationTimeout(timeout: number): AnimateOptions {
+        this.put("navigation_timeout", timeout.toString());
 
         return this;
     }
