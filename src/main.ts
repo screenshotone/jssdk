@@ -350,6 +350,16 @@ export class TakeOptions {
     }
 
     /**
+     * Max height.
+     */
+    fullPageMaxHeight(maxHeight: number): TakeOptions {
+        this.put("full_page_max_height", maxHeight.toString());
+
+        return this;
+    }
+
+
+    /**
      * Sets response format, one of: "png", "jpeg", "webp" or "jpg".
      */
     format(format: string): TakeOptions {
