@@ -369,6 +369,15 @@ export class TakeOptions {
     }
 
     /**
+     * Sets IP country code.
+     */
+    ipCountryCode(format: string): TakeOptions {
+        this.put("ip_country_code", format);
+
+        return this;
+    }
+
+    /**
      * Renders image with the specified quality. Available for the next formats: "jpeg" ("jpg"), "webp".
      */
     imageQuality(imageQuality: number): TakeOptions {
