@@ -1246,6 +1246,11 @@ export class AnimateOptions {
         return this;
     }
 
+    scrollBack(scrollBack: boolean): AnimateOptions {
+        this.put("scroll_back", scrollBack ? "true" : "false");
+        return this;
+    }
+
     toQuery(): URLSearchParams {
         return new URLSearchParams(this.query.toString());
     }
