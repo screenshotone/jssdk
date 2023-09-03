@@ -14,6 +14,12 @@ export class Client {
     private readonly secretKey: string;
 
     constructor(accessKey: string, secretKey: string) {
+        if (!accessKey || !secretKey) {
+            throw new Error(
+                "Both non-empty access and secret keys are required"
+            );
+        }
+
         this.accessKey = accessKey;
         this.secretKey = secretKey;
     }
