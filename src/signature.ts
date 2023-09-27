@@ -3,7 +3,10 @@ import { Crypto } from "@peculiar/webcrypto";
 const encoder = new TextEncoder();
 
 export async function signQueryString(queryString: string, secretKey: string) {
-    const webCrypto = crypto ? crypto : new Crypto();
+    const webCrypto =
+        typeof globalThis.crypto !== "undefined"
+            ? globalThis.crypto
+            : new Crypto();
 
     let algorithm = { name: "HMAC", hash: "SHA-256" };
     let key = await webCrypto.subtle.importKey(
