@@ -139,7 +139,9 @@ export class Client {
         path: string,
         bucket?: string,
         acl?: "public-read" | "",
-        storageClass?: string
+        storageClass?: string, 
+        accessKeyId?: string,
+        secretAccessKey?: string,
     ): Promise<{ bucket: string | null; key: string | null }> {
         options.store(true).storagePath(path).responseType("empty");
 
@@ -151,6 +153,12 @@ export class Client {
         }
         if (storageClass) {
             options.storageClass(storageClass);
+        }
+        if (accessKeyId) {
+            options.storageAccessKeyId(accessKeyId)
+        }
+        if (secretAccessKey) {
+            options.storageSecretAccessKey(secretAccessKey)
         }
 
         const url =
@@ -725,6 +733,24 @@ export class TakeOptions {
     }
 
     /**
+     * Access key ID. It overrides the one specified in the dashboard configuration.
+     */
+    storageAccessKeyId(accessKeyId: string): TakeOptions {
+        this.put("storage_access_key_id", accessKeyId);
+
+        return this;
+    }
+
+    /**
+     * Secret access key. It overrides the one specified in the dashboard configuration.
+     */
+    storageSecretAccessKey(secretAccessKey: string): TakeOptions {
+        this.put("storage_secret_access_key", secretAccessKey);
+
+        return this;
+    }
+
+    /**
      * Storage class allows you to specify the object storage class.
      */
     storageClass(storageClass: string): TakeOptions {
@@ -1194,7 +1220,7 @@ export class AnimateOptions {
     storageAccessKeyId(accessKeyId: string): AnimateOptions {
         this.put("storage_access_key_id", accessKeyId);
 
-        return this
+        return this;
     }
 
     /**
@@ -1203,7 +1229,7 @@ export class AnimateOptions {
     storageSecretAccessKey(secretAccessKey: string): AnimateOptions {
         this.put("storage_secret_access_key", secretAccessKey);
 
-        return this
+        return this;
     }
 
     /**
