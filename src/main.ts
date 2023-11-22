@@ -1189,6 +1189,24 @@ export class AnimateOptions {
     }
 
     /**
+     * Access key ID. It overrides the one specified in the dashboard configuration.
+     */
+    storageAccessKeyId(accessKeyId: string): AnimateOptions {
+        this.put("storage_access_key_id", accessKeyId);
+
+        return this
+    }
+
+    /**
+     * Secret access key. It overrides the one specified in the dashboard configuration.
+     */
+    storageSecretAccessKey(secretAccessKey: string): AnimateOptions {
+        this.put("storage_secret_access_key", secretAccessKey);
+
+        return this
+    }
+
+    /**
      * The parameter is required if you set store=true.
      * You must specify the key for the file, but don’t specify an extension,
      * it will be added automatically based on the format you specified.
