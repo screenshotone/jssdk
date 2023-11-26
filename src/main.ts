@@ -381,6 +381,38 @@ export class TakeOptions {
     }
 
     /**
+     * When the site responds within the range of 200-299 status code,
+     * you can ignore errors and take a screenshot of the error page anyway.
+     * To do that, set the option ignore_host_errors to true.
+     * It is false by default.
+     *
+     * It is helpful when you want to create a gallery of error pages or,
+     * for some reason, you need to render error pages.
+     */
+    ignoreHostErrors(ignore: boolean): TakeOptions {
+        this.put("ignore_host_errors", ignore ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Use wait_until to wait until an event occurred before taking a screenshot or rendering HTML or PDF.
+     *
+     * The default value of wait_until is ['load']. Allowed values are:
+     *  - load: the navigation is successful when the load even is fired;
+     *  - domcontentloaded: the navigation is finished when the DOMContentLoaded even is fired;
+     *  - networkidle0: the navigation is finished when there are no more than 0 network connections for at least 500 ms;
+     *  - networkidle2: consider navigation to be finished when there are no more than 2 network connections for at least 500 ms.
+     *
+     * The parameter accepts many values. It means that screenshots will be taken after all events occur altogether.
+     */
+    waitUntil(...until: string[]): TakeOptions {
+        this.put("wait_until", ...until);
+
+        return this;
+    }
+
+    /**
      * Sets IP country code.
      */
     ipCountryCode(format: string): TakeOptions {
