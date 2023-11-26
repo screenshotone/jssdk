@@ -12,8 +12,9 @@ const API_ANIMATE_PATH = "/animate";
 export class Client {
     private readonly accessKey: string;
     private readonly secretKey: string;
+    private readonly apiBaseUrl: string;
 
-    constructor(accessKey: string, secretKey: string) {
+    constructor(accessKey: string, secretKey: string, apiBaseUrl?: string) {
         if (!accessKey || !secretKey) {
             throw new Error(
                 "Both non-empty access and secret keys are required"
@@ -22,6 +23,7 @@ export class Client {
 
         this.accessKey = accessKey;
         this.secretKey = secretKey;
+        this.apiBaseUrl = apiBaseUrl ? apiBaseUrl : API_BASE_URL;
     }
 
     /**
@@ -37,7 +39,7 @@ export class Client {
         query.append("access_key", this.accessKey);
         let queryString = query.toString();
 
-        return `${API_BASE_URL}${API_TAKE_PATH}?${queryString}`;
+        return `${this.apiBaseUrl}${API_TAKE_PATH}?${queryString}`;
     }
 
     /**
@@ -55,7 +57,7 @@ export class Client {
         const signature = await signQueryString(queryString, this.secretKey);
         queryString += "&signature=" + signature;
 
-        return `${API_BASE_URL}${API_TAKE_PATH}?${queryString}`;
+        return `${this.apiBaseUrl}${API_TAKE_PATH}?${queryString}`;
     }
 
     /**
@@ -73,7 +75,7 @@ export class Client {
         const signature = await signQueryString(queryString, this.secretKey);
         queryString += "&signature=" + signature;
 
-        return `${API_BASE_URL}${API_ANIMATE_PATH}?${queryString}`;
+        return `${this.apiBaseUrl}${API_ANIMATE_PATH}?${queryString}`;
     }
 
     /**
@@ -139,9 +141,9 @@ export class Client {
         path: string,
         bucket?: string,
         acl?: "public-read" | "",
-        storageClass?: string, 
+        storageClass?: string,
         accessKeyId?: string,
-        secretAccessKey?: string,
+        secretAccessKey?: string
     ): Promise<{ bucket: string | null; key: string | null }> {
         options.store(true).storagePath(path).responseType("empty");
 
@@ -155,10 +157,10 @@ export class Client {
             options.storageClass(storageClass);
         }
         if (accessKeyId) {
-            options.storageAccessKeyId(accessKeyId)
+            options.storageAccessKeyId(accessKeyId);
         }
         if (secretAccessKey) {
-            options.storageSecretAccessKey(secretAccessKey)
+            options.storageSecretAccessKey(secretAccessKey);
         }
 
         const url =
