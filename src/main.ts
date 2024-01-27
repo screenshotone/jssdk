@@ -471,6 +471,42 @@ export class TakeOptions {
     }
 
     /**
+     * The clip_x option specifies only the top coordinate (x) of the area to clip.
+     */
+    clipX(clipX: number): TakeOptions {
+        this.put("clip_x", clipX.toString());
+
+        return this;
+    }
+
+    /**
+     * The clip_y option specifies only the top coordinate (y) of the area to clip.
+     */
+    clipY(clipY: number): TakeOptions {
+        this.put("clip_y", clipY.toString());
+
+        return this;
+    }
+
+    /**
+     * The clip_width option specifies only the width of the area to clip.
+     */
+    clipWidth(clipWidth: number): TakeOptions {
+        this.put("clip_width", clipWidth.toString());
+
+        return this;
+    }
+
+    /**
+     * The clip_height option specifies only the width of the area to clip.
+     */
+    clipHeight(clipHeight: number): TakeOptions {
+        this.put("clip_height", clipHeight.toString());
+
+        return this;
+    }
+
+    /**
      * Sets the device scale factor. Acceptable value is one of: 1, 2 or 3.
      */
     deviceScaleFactor(deviceScaleFactor: number): TakeOptions {
