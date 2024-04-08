@@ -696,6 +696,16 @@ export class TakeOptions {
     }
 
     /**
+     * After the given element appears in the viewport and its top coordinate is aligned with the viewport’s top,
+     * you can adjust the position a bit before taking a screenshot.
+     */
+    scrollIntoViewAdjustTop(adjustTop: number): TakeOptions {
+        this.put("scroll_into_view_adjust_top", adjustTop.toString());
+
+        return this;
+    }
+
+    /**
      * You can use your custom proxy to take screenshots
      * or render HTML with the proxy option.
      *
