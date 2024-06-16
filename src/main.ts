@@ -95,7 +95,7 @@ export class Client {
             const data = await response.json();
 
             throw new Error(
-                `failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`
+                `failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.error_message}`
             );
         } catch (e) {
             throw new Error(
@@ -121,7 +121,7 @@ export class Client {
             const data = await response.json();
 
             throw new Error(
-                `failed to generate animation, response returned ${response.status} ${response.statusText}: ${data?.message}`
+                `failed to generate animation, response returned ${response.status} ${response.statusText}: ${data?.error_message}`
             );
         } catch (e) {
             throw new Error(
