@@ -248,7 +248,7 @@ export class TakeOptions {
     /**
      * Available response types:
      * by_format — return exactly the response defined in the format option. If format=png, the response will be the binary representation of the png with the content type header image/png;
-     * empty — return only status or error. It is suitable when you want to upload the screenshot to storage and don’t care about the results. It also speeds up the response since there are no networking costs involved.
+     * empty — return only status or error. It is suitable when you want to upload the screenshot to storage and don't care about the results. It also speeds up the response since there are no networking costs involved.
      * The default value is by_format.
      */
     responseType(responseType: string) {
@@ -300,7 +300,7 @@ export class TakeOptions {
     /**
      * Set `true` to request site rendering, if supported, in the dark mode.
      * Set `false` to request site rendering in the light mode if supported.
-     * If you don’t set the parameter. The site is rendered in the default mode.
+     * If you don't set the parameter. The site is rendered in the default mode.
      */
     darkMode(darkMode: boolean): TakeOptions {
         this.put("dark_mode", darkMode ? "true" : "false");
@@ -696,7 +696,7 @@ export class TakeOptions {
     }
 
     /**
-     * After the given element appears in the viewport and its top coordinate is aligned with the viewport’s top,
+     * After the given element appears in the viewport and its top coordinate is aligned with the viewport's top,
      * you can adjust the position a bit before taking a screenshot.
      */
     scrollIntoViewAdjustTop(adjustTop: number): TakeOptions {
@@ -787,9 +787,9 @@ export class TakeOptions {
 
     /**
      * The parameter is required if you set store=true.
-     * You must specify the key for the file, but don’t specify an extension,
+     * You must specify the key for the file, but don't specify an extension,
      * it will be added automatically based on the format you specified.
-     * You can also specify “subdirectories” in the path part.
+     * You can also specify "subdirectories" in the path part.
      */
     storagePath(path: string): TakeOptions {
         this.put("storage_path", path);
@@ -899,7 +899,7 @@ export class AnimateOptions {
     /**
      * Available response types:
      * by_format — return exactly the response defined in the format option. If format=png, the response will be the binary representation of the png with the content type header image/png;
-     * empty — return only status or error. It is suitable when you want to upload the screenshot to storage and don’t care about the results. It also speeds up the response since there are no networking costs involved.
+     * empty — return only status or error. It is suitable when you want to upload the screenshot to storage and don't care about the results. It also speeds up the response since there are no networking costs involved.
      * The default value is by_format.
      */
     responseType(responseType: string) {
@@ -933,7 +933,7 @@ export class AnimateOptions {
     /**
      * Set `true` to request site rendering, if supported, in the dark mode.
      * Set `false` to request site rendering in the light mode if supported.
-     * If you don’t set the parameter. The site is rendered in the default mode.
+     * If you don't set the parameter. The site is rendered in the default mode.
      */
     darkMode(darkMode: boolean): AnimateOptions {
         this.put("dark_mode", darkMode ? "true" : "false");
@@ -1314,9 +1314,9 @@ export class AnimateOptions {
 
     /**
      * The parameter is required if you set store=true.
-     * You must specify the key for the file, but don’t specify an extension,
+     * You must specify the key for the file, but don't specify an extension,
      * it will be added automatically based on the format you specified.
-     * You can also specify “subdirectories” in the path part.
+     * You can also specify "subdirectories" in the path part.
      */
     storagePath(path: string): AnimateOptions {
         this.put("storage_path", path);
@@ -1411,6 +1411,21 @@ export class AnimateOptions {
 
     scrollBy(pixels: number): AnimateOptions {
         this.put("scroll_by", pixels.toString());
+
+        return this;
+    }
+
+    /**
+     * When the site responds out of the range of 200-299 status code,
+     * you can ignore errors and take a screenshot of the error page anyway.
+     * To do that, set the option "ignore_host_errors" to true.
+     * It is false by default.
+     *
+     * It is helpful when you want to create a gallery of error pages or,
+     * for some reason, you need to render error pages.
+     */
+    ignoreHostErrors(ignore: boolean): AnimateOptions {
+        this.put("ignore_host_errors", ignore ? "true" : "false");
 
         return this;
     }
