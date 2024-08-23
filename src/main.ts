@@ -1377,7 +1377,6 @@ export class AnimateOptions {
 
         return this;
     }
-
     scrollStartImmediately(startImmediately: boolean): AnimateOptions {
         this.put(
             "scroll_start_immediately",
@@ -1388,6 +1387,31 @@ export class AnimateOptions {
 
     scrollBack(scrollBack: boolean): AnimateOptions {
         this.put("scroll_back", scrollBack ? "true" : "false");
+        
+        return this;
+    }
+
+    scrollBackAfterDuration(duration: number): AnimateOptions {
+        this.put("scroll_back_after_duration", duration.toString());
+
+        return this;
+    }
+
+    scrollStartDelay(delay: number): AnimateOptions {
+        this.put("scroll_start_delay", delay.toString());
+
+        return this;
+    }
+
+    scrollComplete(complete: boolean): AnimateOptions {
+        this.put("scroll_complete", complete ? "true" : "false");
+
+        return this;
+    }
+
+    scrollBy(pixels: number): AnimateOptions {
+        this.put("scroll_by", pixels.toString());
+
         return this;
     }
 
