@@ -36,11 +36,24 @@ const url = client.generateTakeURL(options);
 console.log(url);
 // expected output: https://api.screenshotone.com/take?url=https%3A%2F%2Fexample.com&delay=3&block_ads=true&access_key=%3Caccess+key%3E&signature=7f3419ece2c53ed2c7923c7d5deef290d662c3643822bf69ec8259ce10b3ea61
 
-// or download the screenshot
-const imageBlob = await client.take(options);
-const buffer = Buffer.from(await imageBlob.arrayBuffer());
-fs.writeFileSync("example.png", buffer)
-// the screenshot is store in the example.png file
+// download the screenshot and handle potential API errors
+try {
+    const imageBlob = await client.take(options);
+
+    const buffer = Buffer.from(await imageBlob.arrayBuffer());
+    fs.writeFileSync("example.png", buffer);
+} catch (error) {
+    if (error instanceof screenshotone.APIError) {
+        // An API error occurred with 
+        // HTTP Status Code: error.httpStatusCode
+        // Error Code: error.errorCode
+        // Error Message: error.errorMessage
+        // Documentation URL: error.documentationUrl 
+    } else {        
+        // An unexpected error occurred
+        console.error("An unexpected error occurred:", error.message);
+    }
+}
 ```
 
 ## Build and publish (a manual for SDK developers)
