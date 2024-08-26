@@ -1,3 +1,4 @@
+import APIError from "../src/errors";
 import { TakeOptions, Client, AnimateOptions } from "../src/main";
 
 describe("testing client", () => {
@@ -51,5 +52,26 @@ describe("testing client", () => {
             .blockAds(true);
 
         expect(options.toQuery().getAll("block_ads").length).toBe(1);
+    });
+
+    test("returning an API error when the response is not successful", async () => {
+        jest.mock('cross-fetch', () => ({
+            __esModule: true,
+            default: jest.fn().mockImplementationOnce(() =>
+                Promise.resolve({
+                    ok: false,
+                    status: 400,
+                    statusText: "Bad Request",
+                    json: () => Promise.resolve({
+                        error_code: "name_not_resolved",
+                        error_message: "Usually, the error happens when the domain name of the requested URL is not resolved. If you are trying to take a screenshot of the new site, please, wait a bit until the DNS records are refreshed.",
+                        documentation_url: "https://screenshotone.com/docs/errors/"
+                    })
+                })
+            )
+        }));
+
+        const options = AnimateOptions.url("https://example.com");
+        await expect(client.animate(options)).rejects.toThrow(APIError);
     });
 });

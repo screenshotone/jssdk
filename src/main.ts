@@ -1,6 +1,7 @@
 import Big from "big.js";
 import fetch from "cross-fetch";
 import { signQueryString } from "./signature";
+import APIError from "./errors";
 
 const API_BASE_URL = "https://api.screenshotone.com";
 const API_TAKE_PATH = "/take";
@@ -120,12 +121,20 @@ export class Client {
         try {
             const data = await response.json();
 
-            throw new Error(
-                `failed to generate animation, response returned ${response.status} ${response.statusText}: ${data?.error_message}`
-            );
+            throw new APIError(
+                `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
+                response.status,
+                data?.error_code,
+                data?.error_message,
+                data?.documentation_url
+            );            
         } catch (e) {
+            if (e instanceof APIError) {
+                throw e;
+            }
+
             throw new Error(
-                `failed to generate animation, response returned ${response.status} ${response.statusText}`
+                `Failed to generate animation, response returned ${response.status} (${response.statusText})`
             );
         }
     }
