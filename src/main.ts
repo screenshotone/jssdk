@@ -250,7 +250,7 @@ export class TakeOptions {
     /**
      * Selector is a CSS-like selector of the element to take a screenshot of.
      */
-    selector(selector: string) {
+    selector(selector: string): TakeOptions {
         this.put("selector", selector);
 
         return this;
@@ -263,7 +263,7 @@ export class TakeOptions {
      * json — A method returns the response in the JSON format, but it is only suitable if you use options that are effective for JSON. By default, the JSON response will be empty. But for example, when you use caching, the JSON will be populated with additional data.
      * The default value is by_format.
      */
-    responseType(responseType: string) {
+    responseType(responseType: string): TakeOptions {
         this.put("response_type", responseType);
 
         return this;
@@ -272,7 +272,7 @@ export class TakeOptions {
     /**
      * It determines the behavior of what to do when selector is not found.
      */
-    errorOnSelectorNotFound(errorOn: boolean) {
+    errorOnSelectorNotFound(errorOn: boolean): TakeOptions {
         this.put("error_on_selector_not_found", errorOn ? "true" : "false");
 
         return this;
@@ -281,7 +281,7 @@ export class TakeOptions {
     /**
      * Capture beyond the viewport.
      */
-    captureBeyondViewport(beyond: boolean) {
+    captureBeyondViewport(beyond: boolean): TakeOptions {
         this.put("capture_beyond_viewport", beyond ? "true" : "false");
 
         return this;
@@ -350,7 +350,7 @@ export class TakeOptions {
     /**
      * Styles specifies custom CSS styles for the page.
      */
-    styles(styles: string) {
+    styles(styles: string): TakeOptions {
         this.put("styles", styles);
 
         return this;
@@ -359,7 +359,7 @@ export class TakeOptions {
     /**
      * Scripts specifies custom scripts for the page.
      */
-    scripts(scripts: string) {
+    scripts(scripts: string): TakeOptions {
         this.put("scripts", scripts);
 
         return this;
@@ -848,6 +848,213 @@ export class TakeOptions {
     storageClass(storageClass: string): TakeOptions {
         this.put("storage_class", storageClass);
 
+        return this;
+    }
+
+    /**
+     * Sets the image width for thumbnail creation.
+     */
+    imageWidth(width: number): TakeOptions {
+        this.put("image_width", width.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets the image height for thumbnail creation.
+     */
+    imageHeight(height: number): TakeOptions {
+        this.put("image_height", height.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets whether to request GPU rendering.
+     */
+    requestGpuRendering(request: boolean): TakeOptions {
+        this.put("request_gpu_rendering", request ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to print background for PDF.
+     */
+    pdfPrintBackground(print: boolean): TakeOptions {
+        this.put("pdf_print_background", print ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to fit PDF to one page.
+     */
+    pdfFitOnePage(fit: boolean): TakeOptions {
+        this.put("pdf_fit_one_page", fit ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the OpenAI API key for vision integration.
+     */
+    openAiApiKey(key: string): TakeOptions {
+        this.put("openai_api_key", key);
+
+        return this;
+    }
+
+    /**
+     * Sets the vision prompt for OpenAI integration.
+     */
+    visionPrompt(prompt: string): TakeOptions {
+        this.put("vision_prompt", prompt);
+
+        return this;
+    }
+
+    /**
+     * Sets the maximum tokens for OpenAI vision response.
+     */
+    visionMaxTokens(tokens: number): TakeOptions {
+        this.put("vision_max_tokens", tokens.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets whether to bypass Content Security Policy.
+     */
+    bypassCsp(bypass: boolean): TakeOptions {
+        this.put("bypass_csp", bypass ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to wait for a specific selector.
+     */
+    waitForSelector(selector: string): TakeOptions {
+        this.put("wait_for_selector", selector);
+
+        return this;
+    }
+
+    /**
+     * Sets whether to return the storage location.
+     */
+    storageReturnLocation(return_location: boolean): TakeOptions {
+        this.put("storage_return_location", return_location ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to include image size metadata.
+     */
+    metadataImageSize(include: boolean): TakeOptions {
+        this.put("metadata_image_size", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to include fonts metadata.
+     */
+    metadataFonts(include: boolean): TakeOptions {
+        this.put("metadata_fonts", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to include Open Graph metadata.
+     */
+    metadataOpenGraph(include: boolean): TakeOptions {
+        this.put("metadata_open_graph", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to include page title metadata.
+     */
+    metadataPageTitle(include: boolean): TakeOptions {
+        this.put("metadata_page_title", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to include content metadata.
+     */
+    metadataContent(include: boolean): TakeOptions {
+        this.put("metadata_content", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to include HTTP response status code metadata.
+     */
+    metadataHttpResponseStatusCode(include: boolean): TakeOptions {
+        this.put("metadata_http_response_status_code", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to include HTTP response headers metadata.
+     */
+    metadataHttpResponseHeaders(include: boolean): TakeOptions {
+        this.put("metadata_http_response_headers", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to execute the request asynchronously.
+     */
+    async(isAsync: boolean): TakeOptions {
+        this.put("async", isAsync ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the webhook URL for asynchronous requests.
+     */
+    webhookUrl(url: string): TakeOptions {
+        this.put("webhook_url", url);
+
+        return this;
+    }
+
+    /**
+     * Sets whether to sign the webhook request.
+     */
+    webhookSign(sign: boolean): TakeOptions {
+        this.put("webhook_sign", sign ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the text to check for in the content to force request failure.
+     */
+    failIfContentContains(text: string): TakeOptions {
+        this.put("fail_if_content_contains", text);
+
+        return this;
+    }
+
+    /**
+     * Sets whether to fail if GPU rendering fails.
+     */
+    failIfGpuRenderingFails(fail: boolean): TakeOptions {
+        this.put("fail_if_gpu_rendering_fails", fail ? "true" : "false");
+        
         return this;
     }
 
@@ -1441,6 +1648,178 @@ export class AnimateOptions {
 
         return this;
     }
+
+    /**
+     * Sets whether to request GPU rendering.
+     */
+    requestGpuRendering(request: boolean): AnimateOptions {
+        this.put("request_gpu_rendering", request ? "true" : "false");
+        
+        return this;
+    }
+
+    /**
+     * Sets whether to bypass Content Security Policy.
+     */
+    bypassCsp(bypass: boolean): AnimateOptions {
+        this.put("bypass_csp", bypass ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to wait for a specific selector.
+     */
+    waitForSelector(selector: string): AnimateOptions {
+        this.put("wait_for_selector", selector);
+
+        return this;
+    }
+
+    /**
+     * Sets whether to return the storage location.
+     */
+    storageReturnLocation(return_location: boolean): AnimateOptions {
+        this.put("storage_return_location", return_location ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets whether to execute the request asynchronously.
+     */
+    async(isAsync: boolean): AnimateOptions {
+        this.put("async", isAsync ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the webhook URL for asynchronous requests.
+     */
+    webhookUrl(url: string): AnimateOptions {
+        this.put("webhook_url", url);
+
+        return this;
+    }
+
+    /**
+     * Sets whether to sign the webhook request.
+     */
+    webhookSign(sign: boolean): AnimateOptions {
+        this.put("webhook_sign", sign ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the text to check for in the content to force request failure.
+     */
+    failIfContentContains(text: string): AnimateOptions {
+        this.put("fail_if_content_contains", text);
+
+        return this;
+    }
+
+    /**
+     * Sets whether to fail if GPU rendering fails.
+     */
+    failIfGpuRenderingFails(fail: boolean): AnimateOptions {
+        this.put("fail_if_gpu_rendering_fails", fail ? "true" : "false");
+
+        return this;
+    }
+
+
+    /**
+     * Sets the width of the animation.
+     */
+    width(width: number): AnimateOptions {
+        this.put("width", width.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets the height of the animation.
+     */
+    height(height: number): AnimateOptions {
+        this.put("height", height.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets the aspect ratio of the animation.
+     */
+    aspectRatio(ratio: string): AnimateOptions {
+        this.put("aspect_ratio", ratio);
+
+        return this;
+    }
+
+    /**
+     * Sets the scroll easing effect.
+     */
+    scrollEasing(easing: string): AnimateOptions {
+        this.put("scroll_easing", easing);
+
+        return this;
+    }
+
+    /**
+     * Sets whether to navigate while scrolling and record the new opened page.
+     */
+    scrollTryNavigate(tryNavigate: boolean): AnimateOptions {
+        this.put("scroll_try_navigate", tryNavigate ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets when to navigate after scrolling (in milliseconds).
+     */
+    scrollNavigateAfter(duration: number): AnimateOptions {
+        this.put("scroll_navigate_after", duration.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets the URL to navigate to while scrolling.
+     */
+    scrollNavigateToURL(url: string): AnimateOptions {
+        this.put("scroll_navigate_to_url", url);
+
+        return this;
+    }
+
+    /**
+     * Sets the link hints for navigation while scrolling.
+     */
+    scrollNavigateLinkHints(...hints: string[]): AnimateOptions {
+        this.put("scroll_navigate_link_hints", ...hints);
+
+        return this;
+    }
+
+    /**
+     * Sets the scroll back algorithm.
+     */
+    scrollBackAlgorithm(algorithm: string): AnimateOptions {
+        this.put("scroll_back_algorithm", algorithm);
+
+        return this;
+    }
+
+    /**
+     * Sets when to stop scrolling after the specified duration in milliseconds.
+     */
+    scrollStopAfterDuration(duration: number): AnimateOptions {
+        this.put("scroll_stop_after_duration", duration.toString());
+        return this;
+    }
+
 
     toQuery(): URLSearchParams {
         return new URLSearchParams(this.query.toString());
