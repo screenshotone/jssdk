@@ -260,6 +260,7 @@ export class TakeOptions {
      * Available response types:
      * by_format — return exactly the response defined in the format option. If format=png, the response will be the binary representation of the png with the content type header image/png;
      * empty — return only status or error. It is suitable when you want to upload the screenshot to storage and don't care about the results. It also speeds up the response since there are no networking costs involved.
+     * json — A method returns the response in the JSON format, but it is only suitable if you use options that are effective for JSON. By default, the JSON response will be empty. But for example, when you use caching, the JSON will be populated with additional data.
      * The default value is by_format.
      */
     responseType(responseType: string) {
@@ -291,8 +292,8 @@ export class TakeOptions {
      * the API will request the site to minimize the amount of non-essential motion it uses.
      * When the site supports it, it should use animations as least as possible.
      */
-    reducedMotion(darkMode: boolean): TakeOptions {
-        this.put("reduced_motion", darkMode ? "true" : "false");
+    reducedMotion(reducedMotion: boolean): TakeOptions {
+        this.put("reduced_motion", reducedMotion ? "true" : "false");
 
         return this;
     }
@@ -332,7 +333,7 @@ export class TakeOptions {
     }
 
     /**
-     * The scripts_wain_until option allows you to wait until a given
+     * The scripts_wait_until option allows you to wait until a given
      * set of events after the scripts were executed.
      * It accepts the same values as wait_until and can have multiple values:
      *  - `load`: the navigation is successful when the load even is fired;
@@ -383,7 +384,7 @@ export class TakeOptions {
     }
 
     /**
-     * Sets response format, one of: "png", "jpeg", "webp" or "jpg".
+     * Sets response format, one of: "png", "jpeg", "webp", "jpg", "gif", "jp2", "tiff", "avif", "heif", "pdf", "html".
      */
     format(format: string): TakeOptions {
         this.put("format", format);
@@ -426,8 +427,8 @@ export class TakeOptions {
     /**
      * Sets IP country code.
      */
-    ipCountryCode(format: string): TakeOptions {
-        this.put("ip_country_code", format);
+    ipCountryCode(countryCode: string): TakeOptions {
+        this.put("ip_country_code", countryCode);
 
         return this;
     }
