@@ -1,5 +1,5 @@
 
-class APIError extends Error {
+export default class APIError extends Error {
     public readonly httpStatusCode?: number; 
     public readonly errorCode?: string;
     public readonly errorMessage?: string;
@@ -14,5 +14,3 @@ class APIError extends Error {
         this.documentationUrl = documentationUrl;
     }
 }
-
-export default APIError;

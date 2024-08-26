@@ -7,6 +7,8 @@ const API_BASE_URL = "https://api.screenshotone.com";
 const API_TAKE_PATH = "/take";
 const API_ANIMATE_PATH = "/animate";
 
+export { APIError };
+
 /**
  * Represents an API client for the ScreenshotOne.com API.
  */
