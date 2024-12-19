@@ -392,6 +392,16 @@ export class TakeOptions {
         return this;
     }
 
+
+    /**
+     * Set `true` to scroll the page to the bottom.
+     */
+    fullPageScroll(scroll: boolean): TakeOptions {
+        this.put("full_page_scroll", scroll ? "true" : "false");
+
+        return this;
+    }
+
     /**
      * Sets response format, one of: "png", "jpeg", "webp", "jpg", "gif", "jp2", "tiff", "avif", "heif", "pdf", "html".
      */
