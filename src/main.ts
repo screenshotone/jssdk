@@ -384,6 +384,15 @@ export class TakeOptions {
     }
 
     /**
+     * Sets the algorithm to use for full page screenshot—"by_sections" or ""/"default".
+     */
+    fullPageAlgorithm(algorithm: string): TakeOptions {
+        this.put("full_page_algorithm", algorithm);
+
+        return this;
+    }
+
+    /**
      * Sets response format, one of: "png", "jpeg", "webp", "jpg", "gif", "jp2", "tiff", "avif", "heif", "pdf", "html".
      */
     format(format: string): TakeOptions {
