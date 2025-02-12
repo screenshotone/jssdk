@@ -97,10 +97,18 @@ export class Client {
         try {
             const data = await response.json();
 
-            throw new Error(
-                `failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.error_message}`
+            throw new APIError(
+                `Failed to generate screenshot, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
+                response.status,
+                data?.error_code,
+                data?.error_message,
+                data?.documentation_url
             );
         } catch (e) {
+            if (e instanceof APIError) {
+                throw e;
+            }
+
             throw new Error(
                 `failed to take screenshot, response returned ${response.status} ${response.statusText}`
             );
@@ -129,7 +137,7 @@ export class Client {
                 data?.error_code,
                 data?.error_message,
                 data?.documentation_url
-            );            
+            );
         } catch (e) {
             if (e instanceof APIError) {
                 throw e;
@@ -189,8 +197,12 @@ export class Client {
 
         const data = await response.json();
 
-        throw new Error(
-            `failed to take screenshot, response returned ${response.status} ${response.statusText}: ${data?.message}`
+        throw new APIError(
+            `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
+            response.status,
+            data?.error_code,
+            data?.error_message,
+            data?.documentation_url
         );
     }
 }
@@ -391,7 +403,6 @@ export class TakeOptions {
 
         return this;
     }
-
 
     /**
      * Set `true` to scroll the page to the bottom.
@@ -1018,7 +1029,10 @@ export class TakeOptions {
      * Sets whether to include HTTP response status code metadata.
      */
     metadataHttpResponseStatusCode(include: boolean): TakeOptions {
-        this.put("metadata_http_response_status_code", include ? "true" : "false");
+        this.put(
+            "metadata_http_response_status_code",
+            include ? "true" : "false"
+        );
 
         return this;
     }
@@ -1073,7 +1087,7 @@ export class TakeOptions {
      */
     failIfGpuRenderingFails(fail: boolean): TakeOptions {
         this.put("fail_if_gpu_rendering_fails", fail ? "true" : "false");
-        
+
         return this;
     }
 
@@ -1625,7 +1639,7 @@ export class AnimateOptions {
 
     scrollBack(scrollBack: boolean): AnimateOptions {
         this.put("scroll_back", scrollBack ? "true" : "false");
-        
+
         return this;
     }
 
@@ -1673,7 +1687,7 @@ export class AnimateOptions {
      */
     requestGpuRendering(request: boolean): AnimateOptions {
         this.put("request_gpu_rendering", request ? "true" : "false");
-        
+
         return this;
     }
 
@@ -1748,7 +1762,6 @@ export class AnimateOptions {
 
         return this;
     }
-
 
     /**
      * Sets the width of the animation.
@@ -1838,7 +1851,6 @@ export class AnimateOptions {
         this.put("scroll_stop_after_duration", duration.toString());
         return this;
     }
-
 
     toQuery(): URLSearchParams {
         return new URLSearchParams(this.query.toString());
