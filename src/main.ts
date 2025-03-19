@@ -873,6 +873,16 @@ export class TakeOptions {
     }
 
     /**
+     * Leave empty for Amazon S3, specify only when needed. Any S3-compatible storage is supported,
+     * e.g. "https://<accountId>.r2.cloudflarestorage.com" for Cloudlfare R2 storage.
+     */
+    storageEndpoint(endpoint: string): TakeOptions {
+        this.put("storage_endpoint", endpoint);
+
+        return this;
+    }
+
+    /**
      * Storage class allows you to specify the object storage class.
      */
     storageClass(storageClass: string): TakeOptions {
