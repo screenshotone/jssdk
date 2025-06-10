@@ -414,6 +414,15 @@ export class TakeOptions {
     }
 
     /**
+     * Sets the delay between scroll steps.
+     */
+    fullPageScrollDelay(delay: number): TakeOptions {
+        this.put("full_page_scroll_delay", delay.toString());
+
+        return this;
+    }
+
+    /**
      * Sets response format, one of: "png", "jpeg", "webp", "jpg", "gif", "jp2", "tiff", "avif", "heif", "pdf", "html".
      */
     format(format: string): TakeOptions {
