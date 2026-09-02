@@ -269,6 +269,25 @@ export class TakeOptions {
     }
 
     /**
+     * Sets the algorithm used to capture an element selected with `selector`.
+     * Available values are `default` and `clip`.
+     */
+    selectorAlgorithm(algorithm: string): TakeOptions {
+        this.put("selector_algorithm", algorithm);
+
+        return this;
+    }
+
+    /**
+     * Controls whether the selected element is scrolled into view before capture.
+     */
+    selectorScrollIntoView(scroll: boolean): TakeOptions {
+        this.put("selector_scroll_into_view", scroll ? "true" : "false");
+
+        return this;
+    }
+
+    /**
      * Available response types:
      * by_format — return exactly the response defined in the format option. If format=png, the response will be the binary representation of the png with the content type header image/png;
      * empty — return only status or error. It is suitable when you want to upload the screenshot to storage and don't care about the results. It also speeds up the response since there are no networking costs involved.
@@ -295,6 +314,33 @@ export class TakeOptions {
      */
     captureBeyondViewport(beyond: boolean): TakeOptions {
         this.put("capture_beyond_viewport", beyond ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Includes open and closed shadow DOM roots when extracting page content.
+     */
+    includeShadowDom(include: boolean): TakeOptions {
+        this.put("include_shadow_dom", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the attachment name. The response format is added as the suffix.
+     */
+    attachmentName(name: string): TakeOptions {
+        this.put("attachment_name", name);
+
+        return this;
+    }
+
+    /**
+     * Sets an alphanumeric identifier returned with webhook requests.
+     */
+    externalIdentifier(identifier: string): TakeOptions {
+        this.put("external_identifier", identifier);
 
         return this;
     }
@@ -378,6 +424,48 @@ export class TakeOptions {
     }
 
     /**
+     * Sets a selector for an element to click before taking the screenshot.
+     */
+    click(selector: string): TakeOptions {
+        this.put("click", selector);
+
+        return this;
+    }
+
+    /**
+     * Sets a selector for an element to hover over before taking the screenshot.
+     */
+    hover(selector: string): TakeOptions {
+        this.put("hover", selector);
+
+        return this;
+    }
+
+    /**
+     * Controls whether a missing click selector causes an error.
+     */
+    errorOnClickSelectorNotFound(errorOn: boolean): TakeOptions {
+        this.put(
+            "error_on_click_selector_not_found",
+            errorOn ? "true" : "false"
+        );
+
+        return this;
+    }
+
+    /**
+     * Controls whether a missing hover selector causes an error.
+     */
+    errorOnHoverSelectorNotFound(errorOn: boolean): TakeOptions {
+        this.put(
+            "error_on_hover_selector_not_found",
+            errorOn ? "true" : "false"
+        );
+
+        return this;
+    }
+
+    /**
      * Renders the full page.
      */
     fullPage(fullPage: boolean): TakeOptions {
@@ -418,6 +506,42 @@ export class TakeOptions {
      */
     fullPageScrollDelay(delay: number): TakeOptions {
         this.put("full_page_scroll_delay", delay.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets the number of pixels used for each full-page scroll step.
+     */
+    fullPageScrollBy(pixels: number): TakeOptions {
+        this.put("full_page_scroll_by", pixels.toString());
+
+        return this;
+    }
+
+    /**
+     * Splits a full-page screenshot into smaller vertical image slices.
+     */
+    fullPageSlices(enabled: boolean): TakeOptions {
+        this.put("full_page_slices", enabled ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the maximum height in pixels of each full-page slice.
+     */
+    fullPageSliceHeight(height: number): TakeOptions {
+        this.put("full_page_slice_height", height.toString());
+
+        return this;
+    }
+
+    /**
+     * Sets the vertical overlap in pixels between adjacent full-page slices.
+     */
+    fullPageSliceOverlapHeight(height: number): TakeOptions {
+        this.put("full_page_slice_overlap_height", height.toString());
 
         return this;
     }
@@ -468,6 +592,15 @@ export class TakeOptions {
      */
     ipCountryCode(countryCode: string): TakeOptions {
         this.put("ip_country_code", countryCode);
+
+        return this;
+    }
+
+    /**
+     * Sets the ScreenshotOne server region used for the request.
+     */
+    serversRegion(region: string): TakeOptions {
+        this.put("servers_region", region);
 
         return this;
     }
@@ -664,6 +797,15 @@ export class TakeOptions {
     }
 
     /**
+     * Blocks social widgets.
+     */
+    blockSocials(block: boolean): TakeOptions {
+        this.put("block_socials", block ? "true" : "false");
+
+        return this;
+    }
+
+    /**
      * Blocks trackers.
      */
     blockTrackers(blockTrackers: boolean): TakeOptions {
@@ -764,6 +906,15 @@ export class TakeOptions {
      */
     proxy(proxy: string): TakeOptions {
         this.put("proxy", proxy);
+
+        return this;
+    }
+
+    /**
+     * Bypasses the proxy for requests to matching hostname patterns.
+     */
+    proxyBypassHosts(...hosts: string[]): TakeOptions {
+        this.put("proxy_bypass_hosts", ...hosts);
 
         return this;
     }
@@ -946,6 +1097,69 @@ export class TakeOptions {
     }
 
     /**
+     * Sets whether to render a PDF in landscape orientation.
+     */
+    pdfLandscape(landscape: boolean): TakeOptions {
+        this.put("pdf_landscape", landscape ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the paper format for a PDF.
+     */
+    pdfPaperFormat(format: string): TakeOptions {
+        this.put("pdf_paper_format", format);
+
+        return this;
+    }
+
+    /**
+     * Sets the margin for all sides of a PDF.
+     */
+    pdfMargin(margin: string): TakeOptions {
+        this.put("pdf_margin", margin);
+
+        return this;
+    }
+
+    /**
+     * Sets the top margin of a PDF.
+     */
+    pdfMarginTop(margin: string): TakeOptions {
+        this.put("pdf_margin_top", margin);
+
+        return this;
+    }
+
+    /**
+     * Sets the right margin of a PDF.
+     */
+    pdfMarginRight(margin: string): TakeOptions {
+        this.put("pdf_margin_right", margin);
+
+        return this;
+    }
+
+    /**
+     * Sets the bottom margin of a PDF.
+     */
+    pdfMarginBottom(margin: string): TakeOptions {
+        this.put("pdf_margin_bottom", margin);
+
+        return this;
+    }
+
+    /**
+     * Sets the left margin of a PDF.
+     */
+    pdfMarginLeft(margin: string): TakeOptions {
+        this.put("pdf_margin_left", margin);
+
+        return this;
+    }
+
+    /**
      * Sets the OpenAI API key for vision integration.
      */
     openAiApiKey(key: string): TakeOptions {
@@ -991,6 +1205,16 @@ export class TakeOptions {
     }
 
     /**
+     * Sets how matching selectors are counted while waiting for a selector.
+     * Available values are `at_least_one` and `at_least_by_count`.
+     */
+    waitForSelectorAlgorithm(algorithm: string): TakeOptions {
+        this.put("wait_for_selector_algorithm", algorithm);
+
+        return this;
+    }
+
+    /**
      * Sets whether to return the storage location.
      */
     storageReturnLocation(return_location: boolean): TakeOptions {
@@ -1018,6 +1242,15 @@ export class TakeOptions {
     }
 
     /**
+     * Sets whether to include favicon metadata.
+     */
+    metadataIcon(include: boolean): TakeOptions {
+        this.put("metadata_icon", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
      * Sets whether to include Open Graph metadata.
      */
     metadataOpenGraph(include: boolean): TakeOptions {
@@ -1040,6 +1273,15 @@ export class TakeOptions {
      */
     metadataContent(include: boolean): TakeOptions {
         this.put("metadata_content", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the extracted page content format to `html` or `markdown`.
+     */
+    metadataContentFormat(format: string): TakeOptions {
+        this.put("metadata_content_format", format);
 
         return this;
     }
@@ -1093,10 +1335,40 @@ export class TakeOptions {
     }
 
     /**
-     * Sets the text to check for in the content to force request failure.
+     * Sets whether webhook responses include rendering error details.
      */
-    failIfContentContains(text: string): TakeOptions {
-        this.put("fail_if_content_contains", text);
+    webhookErrors(include: boolean): TakeOptions {
+        this.put("webhook_errors", include ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Sets the text to check for in the content to force request failure.
+     * The option can be specified multiple times.
+     */
+    failIfContentContains(...texts: string[]): TakeOptions {
+        this.put("fail_if_content_contains", ...texts);
+
+        return this;
+    }
+
+    /**
+     * Sets text that must be present in the page content.
+     * The option can be specified multiple times.
+     */
+    failIfContentMissing(...texts: string[]): TakeOptions {
+        this.put("fail_if_content_missing", ...texts);
+
+        return this;
+    }
+
+    /**
+     * Sets request URL patterns whose failure should fail the rendering request.
+     * The option can be specified multiple times.
+     */
+    failIfRequestFailed(...patterns: string[]): TakeOptions {
+        this.put("fail_if_request_failed", ...patterns);
 
         return this;
     }
@@ -1256,6 +1528,15 @@ export class AnimateOptions {
      */
     proxy(proxy: string): AnimateOptions {
         this.put("proxy", proxy);
+
+        return this;
+    }
+
+    /**
+     * Bypasses the proxy for requests to matching hostname patterns.
+     */
+    proxyBypassHosts(...hosts: string[]): AnimateOptions {
+        this.put("proxy_bypass_hosts", ...hosts);
 
         return this;
     }
