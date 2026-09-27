@@ -346,9 +346,20 @@ export class TakeOptions {
     }
 
     /**
-     * When reduced_motion set to `true`,
-     * the API will request the site to minimize the amount of non-essential motion it uses.
-     * When the site supports it, it should use animations as least as possible.
+     * Actively reduces supported motion by finishing animations and pausing media and sliders.
+     * Also enables the reduced-motion preference. The API default is false.
+     * Unlike reducedMotion(), this does not rely only on the website honoring that preference.
+     */
+    reduceMotion(reduceMotion: boolean): TakeOptions {
+        this.put("reduce_motion", reduceMotion ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Requests reduced motion through the prefers-reduced-motion preference.
+     * Websites may ignore this preference; it does not actively freeze motion.
+     * Use reduceMotion(true) to actively reduce motion and enable this preference.
      */
     reducedMotion(reducedMotion: boolean): TakeOptions {
         this.put("reduced_motion", reducedMotion ? "true" : "false");
@@ -1452,12 +1463,23 @@ export class AnimateOptions {
     }
 
     /**
-     * When reduced_motion set to `true`,
-     * the API will request the site to minimize the amount of non-essential motion it uses.
-     * When the site supports it, it should use animations as least as possible.
+     * Actively reduces supported page motion during recording by finishing animations
+     * and pausing media and sliders. Also enables the reduced-motion preference.
+     * The API default is false. Unlike reducedMotion(), this actively freezes motion.
      */
-    reducedMotion(darkMode: boolean): AnimateOptions {
-        this.put("reduced_motion", darkMode ? "true" : "false");
+    reduceMotion(reduceMotion: boolean): AnimateOptions {
+        this.put("reduce_motion", reduceMotion ? "true" : "false");
+
+        return this;
+    }
+
+    /**
+     * Requests reduced motion through the prefers-reduced-motion preference.
+     * Websites may ignore this preference; it does not actively freeze motion.
+     * Use reduceMotion(true) to actively reduce motion and enable this preference.
+     */
+    reducedMotion(reducedMotion: boolean): AnimateOptions {
+        this.put("reduced_motion", reducedMotion ? "true" : "false");
 
         return this;
     }
