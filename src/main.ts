@@ -9,6 +9,25 @@ const API_ANIMATE_PATH = "/animate";
 
 export { APIError };
 
+export interface ClientOptions {
+    /** API base URL. Defaults to https://api.screenshotone.com. */
+    apiBaseUrl?: string;
+    /**
+     * Additional attempts for ECONNRESET errors, including response download
+     * failures. Defaults to 0 (disabled); set a positive value to enable retries.
+     * Retries use exponential backoff with jitter and may start another render.
+     */
+    maxRetries?: number;
+}
+
+function isConnectionReset(error: unknown): boolean {
+    return (
+        typeof error === "object" &&
+        error !== null &&
+        (error as { code?: unknown }).code === "ECONNRESET"
+    );
+}
+
 /**
  * Represents an API client for the ScreenshotOne.com API.
  */
@@ -16,17 +35,52 @@ export class Client {
     private readonly accessKey: string;
     private readonly secretKey: string;
     private readonly apiBaseUrl: string;
+    private readonly maxRetries: number;
 
-    constructor(accessKey: string, secretKey: string, apiBaseUrl?: string) {
+    /**
+     * @param options Client configuration. An API base URL string is also
+     * accepted for compatibility with existing constructor calls.
+     */
+    constructor(
+        accessKey: string,
+        secretKey: string,
+        options: ClientOptions | string = {}
+    ) {
         if (!accessKey || !secretKey) {
             throw new Error(
                 "Both non-empty access and secret keys are required"
             );
         }
 
+        const { apiBaseUrl, maxRetries = 0 } =
+            typeof options === "string" ? { apiBaseUrl: options } : options;
+
+        if (!Number.isSafeInteger(maxRetries) || maxRetries < 0) {
+            throw new RangeError("maxRetries must be a non-negative safe integer");
+        }
+
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.apiBaseUrl = apiBaseUrl ? apiBaseUrl : API_BASE_URL;
+        this.maxRetries = maxRetries;
+    }
+
+    private async withConnectionResetRetries<T>(
+        operation: () => Promise<T>
+    ): Promise<T> {
+        for (let retry = 0; ; retry++) {
+            try {
+                return await operation();
+            } catch (error) {
+                if (!isConnectionReset(error) || retry >= this.maxRetries) {
+                    throw error;
+                }
+
+                const delay =
+                    Math.min(1000 * 2 ** retry, 30000) + Math.random() * 250;
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+        }
     }
 
     /**
@@ -89,30 +143,32 @@ export class Client {
      */
     async take(options: TakeOptions): Promise<Blob> {
         const url = await this.generateSignedTakeURL(options);
-        const response = await fetch(url);
-        if (response.ok) {
-            return await response.blob();
-        }
-
-        try {
-            const data = await response.json();
-
-            throw new APIError(
-                `Failed to generate screenshot, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
-                response.status,
-                data?.error_code,
-                data?.error_message,
-                data?.documentation_url
-            );
-        } catch (e) {
-            if (e instanceof APIError) {
-                throw e;
+        return this.withConnectionResetRetries(async () => {
+            const response = await fetch(url);
+            if (response.ok) {
+                return await response.blob();
             }
 
-            throw new Error(
-                `failed to take screenshot, response returned ${response.status} ${response.statusText}`
-            );
-        }
+            try {
+                const data = await response.json();
+
+                throw new APIError(
+                    `Failed to generate screenshot, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
+                    response.status,
+                    data?.error_code,
+                    data?.error_message,
+                    data?.documentation_url
+                );
+            } catch (e) {
+                if (e instanceof APIError || isConnectionReset(e)) {
+                    throw e;
+                }
+
+                throw new Error(
+                    `failed to take screenshot, response returned ${response.status} ${response.statusText}`
+                );
+            }
+        });
     }
 
     /**
@@ -123,30 +179,32 @@ export class Client {
      */
     async animate(options: AnimateOptions): Promise<Blob> {
         const url = await this.generateSignedAnimateURL(options);
-        const response = await fetch(url);
-        if (response.ok) {
-            return await response.blob();
-        }
-
-        try {
-            const data = await response.json();
-
-            throw new APIError(
-                `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
-                response.status,
-                data?.error_code,
-                data?.error_message,
-                data?.documentation_url
-            );
-        } catch (e) {
-            if (e instanceof APIError) {
-                throw e;
+        return this.withConnectionResetRetries(async () => {
+            const response = await fetch(url);
+            if (response.ok) {
+                return await response.blob();
             }
 
-            throw new Error(
-                `Failed to generate animation, response returned ${response.status} (${response.statusText})`
-            );
-        }
+            try {
+                const data = await response.json();
+
+                throw new APIError(
+                    `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
+                    response.status,
+                    data?.error_code,
+                    data?.error_message,
+                    data?.documentation_url
+                );
+            } catch (e) {
+                if (e instanceof APIError || isConnectionReset(e)) {
+                    throw e;
+                }
+
+                throw new Error(
+                    `Failed to generate animation, response returned ${response.status} (${response.statusText})`
+                );
+            }
+        });
     }
 
     /**
@@ -187,23 +245,25 @@ export class Client {
                 ? await this.generateSignedTakeURL(options)
                 : await this.generateSignedAnimateURL(options);
 
-        const response = await fetch(url);
-        if (response.ok) {
-            return {
-                key: response.headers.get("X-ScreenshotOne-Store-Key"),
-                bucket: response.headers.get("X-ScreenshotOne-Store-Bucket"),
-            };
-        }
+        return this.withConnectionResetRetries(async () => {
+            const response = await fetch(url);
+            if (response.ok) {
+                return {
+                    key: response.headers.get("X-ScreenshotOne-Store-Key"),
+                    bucket: response.headers.get("X-ScreenshotOne-Store-Bucket"),
+                };
+            }
 
-        const data = await response.json();
+            const data = await response.json();
 
-        throw new APIError(
-            `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
-            response.status,
-            data?.error_code,
-            data?.error_message,
-            data?.documentation_url
-        );
+            throw new APIError(
+                `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
+                response.status,
+                data?.error_code,
+                data?.error_message,
+                data?.documentation_url
+            );
+        });
     }
 }
 
