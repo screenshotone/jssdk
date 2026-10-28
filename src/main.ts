@@ -1,13 +1,14 @@
 import Big from "big.js";
 import fetch from "cross-fetch";
 import { signQueryString } from "./signature";
-import APIError from "./errors";
+import APIError, { ConnectionError, ConnectionErrorPhase } from "./errors";
 
 const API_BASE_URL = "https://api.screenshotone.com";
 const API_TAKE_PATH = "/take";
 const API_ANIMATE_PATH = "/animate";
 
-export { APIError };
+export { APIError, ConnectionError };
+export type { ConnectionErrorPhase };
 
 export interface ClientOptions {
     /** API base URL. Defaults to https://api.screenshotone.com. */
@@ -20,12 +21,115 @@ export interface ClientOptions {
     maxRetries?: number;
 }
 
+// the only error code the client retries
+const RETRYABLE_CODE = "ECONNRESET";
+
 function isConnectionReset(error: unknown): boolean {
     return (
         typeof error === "object" &&
         error !== null &&
-        (error as { code?: unknown }).code === "ECONNRESET"
+        (error as { code?: unknown }).code === RETRYABLE_CODE
     );
+}
+
+type FetchResponse = Awaited<ReturnType<typeof fetch>>;
+
+// one call's attempts: the current one, and when the first one started
+interface Attempts {
+    current: number;
+    firstStartedAt?: number;
+}
+
+// what a ConnectionError reports about the request that failed
+interface SentRequest {
+    url: string;
+    attempt: number;
+    startedAt: number;
+    firstStartedAt: number;
+}
+
+const CONNECTION_FAILURES: Record<string, string> = {
+    ECONNRESET: "the connection was reset",
+    EPIPE: "the connection was closed while the request was being sent",
+    ERR_STREAM_PREMATURE_CLOSE:
+        "the connection closed before the whole response arrived",
+    ECONNREFUSED: "the connection was refused",
+    ETIMEDOUT: "the connection timed out",
+    EHOSTUNREACH: "the API host is unreachable",
+    ENETUNREACH: "the network is unreachable",
+    ENOTFOUND: "the API host name couldn't be resolved",
+    EAI_AGAIN: "the API host name couldn't be resolved",
+};
+
+// an open connection that broke, rather than one that couldn't be opened
+const DROPPED_CONNECTION_CODES = [
+    "ECONNRESET",
+    "EPIPE",
+    "ERR_STREAM_PREMATURE_CLOSE",
+];
+
+// The code of a network failure, or undefined for any other error. node-fetch,
+// which cross-fetch uses in Node, rejects with a FetchError of type "system";
+// fetch built on undici rejects with a TypeError caused by the system error.
+function networkFailureCode(error: unknown): string | undefined {
+    if (typeof error !== "object" || error === null) {
+        return undefined;
+    }
+
+    const { type, code, cause } = error as {
+        type?: unknown;
+        code?: unknown;
+        cause?: unknown;
+    };
+    if (type === "system" && typeof code === "string") {
+        return code;
+    }
+
+    if (error instanceof TypeError && typeof cause === "object" && cause) {
+        const causeCode = (cause as { code?: unknown }).code;
+        if (typeof causeCode === "string") {
+            return causeCode;
+        }
+    }
+
+    return undefined;
+}
+
+// the request URL without its query and fragment, which hold the access key
+// and the signature, whatever the URL's form
+function withoutQuery(url: string): string {
+    return url.split(/[?#]/, 1)[0];
+}
+
+// The text without the request's query: exactly as sent, in any URL the text
+// mentions (whatever its scheme spelling, or none), and any credential left.
+function redact(text: string, url: string): string {
+    const query = url.slice(withoutQuery(url).length);
+
+    return (query ? text.split(query).join("") : text)
+        .replace(
+            /((?:[a-z][a-z0-9+.-]*:)?\/\/[^\s?#]+)[?#]\S*?(?=:?(?:\s|$))/gi,
+            "$1"
+        )
+        .replace(/\b(access_key|signature)=[^&\s]+/gi, "$1=[redacted]");
+}
+
+function formatDuration(ms: number): string {
+    return ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`;
+}
+
+function reasonOf(error: unknown, url: string): string | undefined {
+    if (!(error instanceof Error)) {
+        return undefined;
+    }
+
+    const cause = (error as { cause?: unknown }).cause;
+    const message =
+        error instanceof TypeError && cause instanceof Error
+            ? cause.message
+            : error.message;
+
+    return redact(message, url);
 }
 
 /**
@@ -66,11 +170,13 @@ export class Client {
     }
 
     private async withConnectionResetRetries<T>(
-        operation: () => Promise<T>
+        operation: (attempts: Attempts) => Promise<T>
     ): Promise<T> {
+        const attempts: Attempts = { current: 0 };
         for (let retry = 0; ; retry++) {
+            attempts.current = retry + 1;
             try {
-                return await operation();
+                return await operation(attempts);
             } catch (error) {
                 if (!isConnectionReset(error) || retry >= this.maxRetries) {
                     throw error;
@@ -81,6 +187,118 @@ export class Client {
                 await new Promise((resolve) => setTimeout(resolve, delay));
             }
         }
+    }
+
+    // Sends the request. A network failure becomes a ConnectionError.
+    private async send(
+        url: string,
+        attempts: Attempts
+    ): Promise<SentRequest & { response: FetchResponse }> {
+        const startedAt = Date.now();
+        attempts.firstStartedAt ??= startedAt;
+        const request = {
+            url,
+            attempt: attempts.current,
+            startedAt,
+            firstStartedAt: attempts.firstStartedAt,
+        };
+        try {
+            return { ...request, response: await fetch(url) };
+        } catch (error) {
+            throw this.connectionError(error, request, "request") ?? error;
+        }
+    }
+
+    // Reads the response body. A network failure becomes a ConnectionError.
+    private async read<T>(
+        request: SentRequest & { response: FetchResponse },
+        body: (response: FetchResponse) => Promise<T>
+    ): Promise<T> {
+        try {
+            return await body(request.response);
+        } catch (error) {
+            throw (
+                this.connectionError(
+                    error,
+                    request,
+                    "response",
+                    request.response.status
+                ) ?? error
+            );
+        }
+    }
+
+    // A ConnectionError that explains a network failure, or undefined for any
+    // other error
+    private connectionError(
+        error: unknown,
+        request: SentRequest,
+        phase: ConnectionErrorPhase,
+        httpStatusCode?: number
+    ): ConnectionError | undefined {
+        const code = networkFailureCode(error);
+        if (!code) {
+            return undefined;
+        }
+
+        const now = Date.now();
+        const lastElapsedMs = now - request.startedAt;
+        const totalElapsedMs = now - request.firstStartedAt;
+        const endpoint = withoutQuery(request.url);
+        const when =
+            request.attempt > 1
+                ? `${formatDuration(lastElapsedMs)} after the last of ${request.attempt} attempts to ${endpoint} started, ${formatDuration(totalElapsedMs)} after the first`
+                : `${formatDuration(lastElapsedMs)} after the request to ${endpoint} started`;
+        const failure = `${
+            CONNECTION_FAILURES[code] ?? "the connection failed"
+        } (${code}) ${when}`;
+        const dropped = DROPPED_CONNECTION_CODES.includes(code);
+
+        const sentences =
+            phase === "request"
+                ? [
+                      `The connection to the ScreenshotOne API failed before a response arrived: ${failure}.`,
+                  ]
+                : [
+                      `The connection to the ScreenshotOne API failed while downloading the response (HTTP ${httpStatusCode}): ${failure}.`,
+                      httpStatusCode !== undefined && httpStatusCode < 400
+                          ? "The API had already finished the request. Unless the result came from the cache, it counts toward your usage."
+                          : "The API had responded with an error, but its details couldn't be read.",
+                  ];
+
+        if (dropped) {
+            if (phase === "request") {
+                sentences.push(
+                    "The API might not have received the request, or the connection broke while the API was working on it."
+                );
+            }
+            sentences.push(
+                "This usually happens on the network between your server and the API: a proxy, NAT gateway or firewall closed the connection, or an idle kept-alive connection was reused after the network had closed it. It's more likely when many requests start at once."
+            );
+            sentences.push(
+                request.attempt > 1
+                    ? `It failed on all ${request.attempt} attempts. Limit how many requests run at once.`
+                    : code === RETRYABLE_CODE && this.maxRetries === 0
+                    ? "Limit how many requests run at once, or set the maxRetries client option to retry automatically."
+                    : "Limit how many requests run at once."
+            );
+        } else if (code === "ENOTFOUND" || code === "EAI_AGAIN") {
+            sentences.push("Check your server's DNS settings.");
+        } else {
+            sentences.push(
+                "Check that your server can reach the API, including firewall and proxy settings."
+            );
+        }
+
+        return new ConnectionError(sentences.join(" "), {
+            code,
+            phase,
+            lastElapsedMs,
+            totalElapsedMs,
+            attempts: request.attempt,
+            httpStatusCode,
+            reason: reasonOf(error, request.url),
+        });
     }
 
     /**
@@ -143,14 +361,15 @@ export class Client {
      */
     async take(options: TakeOptions): Promise<Blob> {
         const url = await this.generateSignedTakeURL(options);
-        return this.withConnectionResetRetries(async () => {
-            const response = await fetch(url);
+        return this.withConnectionResetRetries(async (attempts) => {
+            const request = await this.send(url, attempts);
+            const response = request.response;
             if (response.ok) {
-                return await response.blob();
+                return await this.read(request, (r) => r.blob());
             }
 
             try {
-                const data = await response.json();
+                const data = await this.read(request, (r) => r.json());
 
                 throw new APIError(
                     `Failed to generate screenshot, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
@@ -160,7 +379,7 @@ export class Client {
                     data?.documentation_url
                 );
             } catch (e) {
-                if (e instanceof APIError || isConnectionReset(e)) {
+                if (e instanceof APIError || e instanceof ConnectionError) {
                     throw e;
                 }
 
@@ -179,14 +398,15 @@ export class Client {
      */
     async animate(options: AnimateOptions): Promise<Blob> {
         const url = await this.generateSignedAnimateURL(options);
-        return this.withConnectionResetRetries(async () => {
-            const response = await fetch(url);
+        return this.withConnectionResetRetries(async (attempts) => {
+            const request = await this.send(url, attempts);
+            const response = request.response;
             if (response.ok) {
-                return await response.blob();
+                return await this.read(request, (r) => r.blob());
             }
 
             try {
-                const data = await response.json();
+                const data = await this.read(request, (r) => r.json());
 
                 throw new APIError(
                     `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
@@ -196,7 +416,7 @@ export class Client {
                     data?.documentation_url
                 );
             } catch (e) {
-                if (e instanceof APIError || isConnectionReset(e)) {
+                if (e instanceof APIError || e instanceof ConnectionError) {
                     throw e;
                 }
 
@@ -245,8 +465,9 @@ export class Client {
                 ? await this.generateSignedTakeURL(options)
                 : await this.generateSignedAnimateURL(options);
 
-        return this.withConnectionResetRetries(async () => {
-            const response = await fetch(url);
+        return this.withConnectionResetRetries(async (attempts) => {
+            const request = await this.send(url, attempts);
+            const response = request.response;
             if (response.ok) {
                 return {
                     key: response.headers.get("X-ScreenshotOne-Store-Key"),
@@ -254,7 +475,7 @@ export class Client {
                 };
             }
 
-            const data = await response.json();
+            const data = await this.read(request, (r) => r.json());
 
             throw new APIError(
                 `Failed to generate animation, response returned ${response.status} (${response.statusText}): ${data?.error_message}`,
