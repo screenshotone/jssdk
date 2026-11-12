@@ -889,15 +889,6 @@ export class TakeOptions {
     }
 
     /**
-     * Sets the ScreenshotOne server region used for the request.
-     */
-    serversRegion(region: string): TakeOptions {
-        this.put("servers_region", region);
-
-        return this;
-    }
-
-    /**
      * Renders image with the specified quality. Available for the next formats: "jpeg" ("jpg"), "webp".
      */
     imageQuality(imageQuality: number): TakeOptions {
@@ -1084,15 +1075,6 @@ export class TakeOptions {
      */
     blockChats(block: boolean): TakeOptions {
         this.put("block_chats", block ? "true" : "false");
-
-        return this;
-    }
-
-    /**
-     * Blocks social widgets.
-     */
-    blockSocials(block: boolean): TakeOptions {
-        this.put("block_socials", block ? "true" : "false");
 
         return this;
     }

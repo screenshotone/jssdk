@@ -74,8 +74,6 @@ describe("testing client", () => {
             .fullPageSlices(true)
             .fullPageSliceHeight(3000)
             .fullPageSliceOverlapHeight(500)
-            .serversRegion("us-east")
-            .blockSocials(true)
             .proxy("http://proxy.example.com")
             .proxyBypassHosts(
                 "cdn.example.com",
@@ -113,8 +111,6 @@ describe("testing client", () => {
             full_page_slices: ["true"],
             full_page_slice_height: ["3000"],
             full_page_slice_overlap_height: ["500"],
-            servers_region: ["us-east"],
-            block_socials: ["true"],
             proxy: ["http://proxy.example.com"],
             proxy_bypass_hosts: [
                 "cdn.example.com",
